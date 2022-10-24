@@ -1,6 +1,7 @@
 package edu.uncc.inclass09;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -101,13 +102,26 @@ public class LoginFragment extends Fragment {
                     try {
                         JSONObject json = new JSONObject(response.body().string());
 
+                        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
 
+                        // Get user info
+                        String token = json.getString("token");
+                        int userID = json.getInt("user_id");
+                        String user_fullname = json.getString("user_fullname");
+
+                        // Store user info
+                        editor.putString("token", token);
+                        editor.putInt("user_id", userID);
+                        editor.putString("user_fullname", user_fullname);
+
+                        mListener.showPosts();
 
                     } catch (JSONException e) {
                         Log.d(TAG, "onResponse: " + e.getMessage());
                     }
                 } else {
-
+                    Toast.makeText(getActivity(), response.body().string(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -123,5 +137,6 @@ public class LoginFragment extends Fragment {
 
     interface LoginListener {
         void createNewAccount();
+        void showPosts();
     }
 }
