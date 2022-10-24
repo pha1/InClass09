@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         String token = sharedPref.getString("token", null);
+
         if (token == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.containerView, new LoginFragment())
