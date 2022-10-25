@@ -114,6 +114,7 @@ public class LoginFragment extends Fragment {
                         editor.putString("token", token);
                         editor.putInt("user_id", userID);
                         editor.putString("user_fullname", user_fullname);
+                        editor.apply();
 
                         mListener.showPosts();
 

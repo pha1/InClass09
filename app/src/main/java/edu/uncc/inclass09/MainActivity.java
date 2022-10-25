@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import edu.uncc.inclass09.models.Post;
 
@@ -54,7 +55,12 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
 
     @Override
     public void logout() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPref.edit().clear().commit();
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.containerView, new LoginFragment())
+                .commit();
     }
 
     @Override
