@@ -36,44 +36,19 @@ import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PostsFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class PostsFragment extends Fragment {
 
     final String TAG = "test";
     private OkHttpClient client = new OkHttpClient();
-
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM_TOKEN = "token";
-
-    private String token;
+    int currentPage = 1;
 
     public PostsFragment() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param token Parameter 1.
-     * @return A new instance of fragment PostsFragment.
-     */
-    public static PostsFragment newInstance(String token) {
-        PostsFragment fragment = new PostsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM_TOKEN, token);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            token = getArguments().getString(ARG_PARAM_TOKEN);
-        }
     }
 
     FragmentPostsBinding binding;
@@ -107,7 +82,7 @@ public class PostsFragment extends Fragment {
             }
         });
 
-        getPosts(1);
+        getPosts(currentPage);
 
         binding.recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         postsAdapter = new PostsAdapter();
@@ -241,12 +216,48 @@ public class PostsFragment extends Fragment {
                 mBinding.imageViewDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d(TAG, "onClick: " + mPost.getCreated_by_name());
+                        deletePost(post.post_id, currentPage);
                     }
                 });
             }
         }
 
+    }
+
+    void deletePost(String post_id, int currentPage) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String token = sharedPref.getString("token", null);
+
+        FormBody formBody = new FormBody.Builder()
+                .add("post_id", post_id)
+                .build();
+
+        Request request = new Request.Builder()
+                .url("https://www.theappsdr.com/posts/delete")
+                .addHeader("Authorization", "BEARER " + token)
+                .post(formBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getPosts(currentPage);
+                        }
+                    });
+                } else {
+                    Log.d(TAG, "onResponse: " + response.body().string());
+                }
+            }
+        });
     }
 
     class PagingAdapter extends RecyclerView.Adapter<PagingAdapter.PagingViewHolder> {
@@ -282,6 +293,7 @@ public class PostsFragment extends Fragment {
                 mBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        currentPage = getAdapterPosition() + 1;
                         getPosts(getAdapterPosition() + 1);
                     }
                 });
