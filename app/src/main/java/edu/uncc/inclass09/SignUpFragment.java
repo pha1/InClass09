@@ -57,7 +57,7 @@ public class SignUpFragment extends Fragment {
                 } else if (password.isEmpty()){
                     Toast.makeText(getActivity(), "Enter valid password!", Toast.LENGTH_SHORT).show();
                 } else {
-
+                    // TODO Create account
                 }
             }
         });

@@ -1,6 +1,9 @@
 package edu.uncc.inclass09;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -216,7 +219,23 @@ public class PostsFragment extends Fragment {
                 mBinding.imageViewDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        deletePost(post.post_id, currentPage);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Click Ok to delete this post.");
+                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                deletePost(post.post_id, currentPage);
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
                     }
                 });
             }
@@ -225,6 +244,8 @@ public class PostsFragment extends Fragment {
     }
 
     void deletePost(String post_id, int currentPage) {
+
+
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         String token = sharedPref.getString("token", null);
 

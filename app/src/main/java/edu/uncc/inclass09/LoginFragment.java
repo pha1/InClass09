@@ -1,6 +1,8 @@
 package edu.uncc.inclass09;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -122,7 +124,16 @@ public class LoginFragment extends Fragment {
                         Log.d(TAG, "onResponse: " + e.getMessage());
                     }
                 } else {
-                    Toast.makeText(getActivity(), response.body().string(), Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(response.body().string());
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });
